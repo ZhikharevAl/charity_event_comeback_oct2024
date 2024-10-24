@@ -1,4 +1,5 @@
 import {v4 as uuid} from 'uuid';
+import {HelpRequestRepository} from "../HelpRequest";
 
 export type UserData = {
     id: string;
@@ -71,7 +72,9 @@ export const generateUsers = (count: number): UserData[] => {
 
 export class UserRepository {
     private users: Record<string, UserData> = {};
-    constructor() {
+    constructor(
+        private readonly requestRepository: HelpRequestRepository,
+    ) {
         const initialUsers = generateUsers(24);
         initialUsers.forEach((user) => {
             this.users[user.id] = user;
@@ -90,7 +93,9 @@ export class UserRepository {
         if (!this.users[userId]) {
             throw new Error("No user with id " + userId);
         }
-        // todo: request checking
+        if (!this.requestRepository.checkIsRequestExist(requestId)) {
+            throw new Error("No request with id " + requestId);
+        }
         this.users[userId].favouriteRequests.push(requestId);
     }
 

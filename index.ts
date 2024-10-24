@@ -7,6 +7,7 @@ import log4js from "log4js";
 import dotenv from "dotenv";
 import loggerSetup from "./src/utils/configureLogger";
 import {UserRepository} from "./src/data/User";
+import {HelpRequestRepository} from "./src/data/HelpRequest";
 
 // envs
 dotenv.config();
@@ -23,7 +24,8 @@ app.use('/api/hui', (req: Request, res: Response) => {
 })
 
 // APP INIT
-const userRepository = new UserRepository();
+const requestRepository = new HelpRequestRepository();
+const userRepository = new UserRepository(requestRepository);
 
 // USER
 app.get('/api/user/favourites', (req: Request, res: Response) => {
@@ -36,12 +38,15 @@ app.post('/api/user/favourites', (req: Request<{requestId: string}>, res: Respon
     const { requestId } = req.body;
     if (!requestId) {
         res.status(400).send("No request id");
+        return;
     }
     const userId= userRepository.getTestUser().id; // todo: change with userId from JWT
     try {
         userRepository.addRequestToFavourites(requestId, userId);
         res.send("Request is added to Favourites successfully.");
     } catch (err) {
+        const logger = log4js.getLogger();
+        logger.error(err);
         res.status(400).send("Failed to add request to favourites");
     }
 })
@@ -50,12 +55,15 @@ app.delete('/api/user/favourites/:requestId', (req: Request, res: Response) => {
     const { requestId } = req.params;
     if (!requestId) {
         res.status(400).send("No request id");
+        return;
     }
     const userId= userRepository.getTestUser().id; // todo: change with userId from JWT
     try {
         userRepository.removeRequestFromFavourites(requestId, userId);
         res.send("Request is removed form Favourites successfully.");
     } catch (err) {
+        const logger = log4js.getLogger();
+        logger.error(err);
         res.status(400).send("Failed to add request to favourites");
     }
 })
@@ -65,6 +73,35 @@ app.use('/api/user', (req: Request, res: Response) => {
     res.json(user);
 })
 
+// HELP REQUESTS
+
+app.post('/api/request/:id/contribution', (req: Request, res: Response) => {
+    const {id} = req.params;
+    if (!requestRepository.checkIsRequestExist(id)) {
+        res.status(404).send("No request found");
+        return;
+    }
+    res.send(`Contribution in Requests ${id} is done successfully.`);
+})
+
+app.get('/api/request/:id', (req: Request, res: Response) => {
+    const {id} = req.params;
+    if (!id) {
+        res.status(400).send("No request id");
+        return;
+    }
+    const request = requestRepository.getRequestDetails(id);
+    if (!request) {
+        res.status(404).send("No request found");
+        return;
+    }
+    res.json(request);
+})
+
+app.get('/api/request', (req: Request, res: Response) => {
+    const requests = requestRepository.getRequests();
+    res.send(requests);
+})
 
 // static server
 app.use(express.static(path.join(__dirname, 'public')));
