@@ -1,5 +1,6 @@
+// @ts-nocheck
 import { createServer } from "http";
-import express, {Request, Response} from 'express';
+import express, {NextFunction, Request, Response} from 'express';
 import path from "node:path";
 import bodyParser from "body-parser";
 import cors from 'cors';
@@ -8,6 +9,7 @@ import dotenv from "dotenv";
 import loggerSetup from "./src/utils/configureLogger";
 import {UserRepository} from "./src/data/User";
 import {HelpRequestRepository} from "./src/data/HelpRequest";
+import {AuthRepository} from "./src/data/Auth";
 
 // envs
 dotenv.config();
@@ -19,17 +21,57 @@ const app = express();
 app.use(cors())
 app.use(bodyParser.json())
 
-app.use('/api/hui', (req: Request, res: Response) => {
-    res.send("HUI");
-})
-
 // APP INIT
 const requestRepository = new HelpRequestRepository();
 const userRepository = new UserRepository(requestRepository);
+const authRepository = new AuthRepository(userRepository.getUsers());
+
+// AUTH
+const authMiddleware = (req: Request<never>, res: Response, next: NextFunction) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+        return res.status(403).json({ message: 'No token provided.' });
+    }
+    const userId = authRepository.verifyToken(token);
+    if (!userId) {
+        return res.status(403).json({ message: 'No token provided.' });
+    }
+    req.userId = userId;
+    next();
+};
+
+
+app.post('/api/auth', (req: Request, res: Response) => {
+    const { login, password } = req.body;
+
+    // Find the user by username
+    const userId = authRepository.getUserIdByLogin(login);
+    const user = userId ? userRepository.getUserById(userId) : null
+    if (!user) {
+        return res.status(400).json({ message: 'Invalid username or password' });
+    }
+
+    // Compare the provided password with the stored hashed password
+    const passwordIsValid = authRepository.checkCredentials(login, password)
+    if (!passwordIsValid) {
+        return res.status(400).json({ message: 'Invalid username or password' });
+    }
+
+    // Create a token (JWT)
+    const token = authRepository.login(login, password);
+    if (!token) {
+        return res.status(400).json({ message: 'Invalid username or password' });
+    }
+
+    // Send the token back to the client
+    res.json({ auth: true, token });
+})
+
+app.use(authMiddleware);
 
 // USER
-app.get('/api/user/favourites', (req: Request, res: Response) => {
-    const userId= userRepository.getTestUser().id; // todo: change with userId from JWT
+app.get('/api/user/favourites', (req: Request<never>, res: Response) => {
+    const userId= req.userId;
     const favourites = userRepository.getUserFavourites(userId);
     res.json(favourites);
 })
@@ -40,7 +82,7 @@ app.post('/api/user/favourites', (req: Request<{requestId: string}>, res: Respon
         res.status(400).send("No request id");
         return;
     }
-    const userId= userRepository.getTestUser().id; // todo: change with userId from JWT
+    const userId= req.userId;
     try {
         userRepository.addRequestToFavourites(requestId, userId);
         res.send("Request is added to Favourites successfully.");
@@ -52,12 +94,12 @@ app.post('/api/user/favourites', (req: Request<{requestId: string}>, res: Respon
 })
 
 app.delete('/api/user/favourites/:requestId', (req: Request, res: Response) => {
+    const userId = req.userId;
     const { requestId } = req.params;
     if (!requestId) {
         res.status(400).send("No request id");
         return;
     }
-    const userId= userRepository.getTestUser().id; // todo: change with userId from JWT
     try {
         userRepository.removeRequestFromFavourites(requestId, userId);
         res.send("Request is removed form Favourites successfully.");
@@ -69,7 +111,7 @@ app.delete('/api/user/favourites/:requestId', (req: Request, res: Response) => {
 })
 
 app.use('/api/user', (req: Request, res: Response) => {
-    const user= userRepository.getTestUser();
+    const user= userRepository.getUserById(req.userId);
     res.json(user);
 })
 
@@ -116,7 +158,6 @@ app.get(/^\/(?!api).*/, (req, res) => {
 
 // web server
 const port = process.env.PORT || 3030;
-// todo: used in servicesConfig | move in separate service
 const server = createServer(app);
 
 // configure of server

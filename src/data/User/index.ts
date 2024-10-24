@@ -1,4 +1,5 @@
 import {v4 as uuid} from 'uuid';
+import bcrypt from 'bcryptjs';
 import {HelpRequestRepository} from "../HelpRequest";
 
 export type UserData = {
@@ -28,6 +29,10 @@ export type UserData = {
         }
     }
     favouriteRequests: string[]; // request ids
+    credentials: {
+        login: string;
+        password: string;
+    }
 }
 
 export const generateUsers = (count: number): UserData[] => {
@@ -64,6 +69,10 @@ export const generateUsers = (count: number): UserData[] => {
                 }
             },
             favouriteRequests: [],
+            credentials: {
+                login: `test${i}`,
+                password: bcrypt.hashSync(`password${i}`, 8)
+            }
         }
         result.push(userData);
     }
@@ -105,9 +114,7 @@ export class UserRepository {
         }
     }
 
-    // todo: delete after testing
-    public getTestUser() {
-        const testId = Object.keys(this.users)[0];
-        return this.users[testId];
+    public getUsers() {
+        return Object.values(this.users);
     }
 }
