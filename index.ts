@@ -1,7 +1,6 @@
 // @ts-nocheck
 import { createServer } from "http";
 import express, {NextFunction, Request, Response} from 'express';
-import path from "node:path";
 import bodyParser from "body-parser";
 import cors from 'cors';
 import log4js from "log4js";
@@ -144,17 +143,6 @@ app.get('/api/request', (req: Request, res: Response) => {
     const requests = requestRepository.getRequests();
     res.send(requests);
 })
-
-// static server
-app.use(express.static(path.join(__dirname, 'public')));
-
-/* Catch-all route for redirecting undefined routes
-* All not-api routes should be redirected to index.html
-* */
-app.get(/^\/(?!api).*/, (req, res) => {
-    console.log("INTERCEPTOR: ", req.method, req.url);
-    res.sendFile(path.join(__dirname, 'public/index.html'));
-});
 
 // web server
 const port = process.env.PORT || 3030;
