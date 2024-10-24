@@ -6,6 +6,7 @@ import cors from 'cors';
 import log4js from "log4js";
 import dotenv from "dotenv";
 import loggerSetup from "./src/utils/configureLogger";
+import {UserRepository} from "./src/data/User";
 
 // envs
 dotenv.config();
@@ -19,7 +20,51 @@ app.use(bodyParser.json())
 
 app.use('/api/hui', (req: Request, res: Response) => {
     res.send("HUI");
-} )
+})
+
+// APP INIT
+const userRepository = new UserRepository();
+
+// USER
+app.get('/api/user/favourites', (req: Request, res: Response) => {
+    const userId= userRepository.getTestUser().id; // todo: change with userId from JWT
+    const favourites = userRepository.getUserFavourites(userId);
+    res.json(favourites);
+})
+
+app.post('/api/user/favourites', (req: Request<{requestId: string}>, res: Response) => {
+    const { requestId } = req.body;
+    if (!requestId) {
+        res.status(400).send("No request id");
+    }
+    const userId= userRepository.getTestUser().id; // todo: change with userId from JWT
+    try {
+        userRepository.addRequestToFavourites(requestId, userId);
+        res.send("Request is added to Favourites successfully.");
+    } catch (err) {
+        res.status(400).send("Failed to add request to favourites");
+    }
+})
+
+app.delete('/api/user/favourites/:requestId', (req: Request, res: Response) => {
+    const { requestId } = req.params;
+    if (!requestId) {
+        res.status(400).send("No request id");
+    }
+    const userId= userRepository.getTestUser().id; // todo: change with userId from JWT
+    try {
+        userRepository.removeRequestFromFavourites(requestId, userId);
+        res.send("Request is removed form Favourites successfully.");
+    } catch (err) {
+        res.status(400).send("Failed to add request to favourites");
+    }
+})
+
+app.use('/api/user', (req: Request, res: Response) => {
+    const user= userRepository.getTestUser();
+    res.json(user);
+})
+
 
 // static server
 app.use(express.static(path.join(__dirname, 'public')));
