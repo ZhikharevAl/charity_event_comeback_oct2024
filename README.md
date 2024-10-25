@@ -28,6 +28,8 @@
 - `npm run build`
 - `docker build -t charity_back .`
 - `docker run -p 4040:4040 charity_back`
+### Использование локального API
+Стучимся в эндпойнты, как на примере: `http://localhost:4040/auth`
 
 ## OpenAPI спецификация
 - файл: `./apispec.yaml`
