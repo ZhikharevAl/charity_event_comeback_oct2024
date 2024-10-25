@@ -1,0 +1,360 @@
+openapi: 3.0.0
+info:
+  title: ExpressJS API
+  version: 1.0.0
+  description: API for user authorization, user data, and help request management
+
+paths:
+  /api/auth:
+    post:
+      summary: User login and JWT token generation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                login:
+                  type: string
+                  example: "user@example.com"
+                password:
+                  type: string
+                  example: "password123"
+      responses:
+        '200':
+          description: Successful login and token generation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auth:
+                    type: boolean
+                    example: true
+                  token:
+                    type: string
+                    example: "jwt-token"
+        '400':
+          description: Invalid login or password
+
+  /api/user/favourites:
+    get:
+      summary: Get user's favourite requests
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Array of user's favourite requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  example: "request-id-1"
+        '401':
+          description: Unauthorized
+
+    post:
+      summary: Add request to user's favourites
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                requestId:
+                  type: string
+                  example: "request-id-1"
+      responses:
+        '200':
+          description: Request added to favourites successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Request is added to Favourites successfully."
+        '400':
+          description: Failed to add request to favourites
+
+  /api/user/favourites/{requestId}:
+    delete:
+      summary: Remove request from user's favourites
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "request-id-1"
+      responses:
+        '200':
+          description: Request removed from favourites successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Request is removed from Favourites successfully."
+        '400':
+          description: Failed to remove request from favourites
+
+  /api/user:
+    get:
+      summary: Get user's profile data
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserData'
+        '401':
+          description: Unauthorized
+
+  /api/request/{id}/contribution:
+    post:
+      summary: Contribute to a help request
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "request-id-1"
+      responses:
+        '200':
+          description: Contribution was successful
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Contribution in Request is done successfully."
+        '404':
+          description: Request not found
+
+  /api/request/{id}:
+    get:
+      summary: Get details of a specific help request
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "request-id-1"
+      responses:
+        '200':
+          description: Help request details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HelpRequestData'
+        '400':
+          description: No request ID provided
+        '404':
+          description: Request not found
+
+  /api/request:
+    get:
+      summary: Get all help requests
+      responses:
+        '200':
+          description: List of all help requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HelpRequestData'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    UserData:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "user-id-1"
+        name:
+          type: string
+          example: "John"
+        lastName:
+          type: string
+          example: "Doe"
+        birthdate:
+          type: string
+          format: date
+          example: "1990-01-01"
+        baseLocations:
+          type: array
+          items:
+            type: object
+            properties:
+              latitude:
+                type: number
+                example: 40.712776
+              longitude:
+                type: number
+                example: -74.005974
+              title:
+                type: string
+                example: "New York"
+        educations:
+          type: array
+          items:
+            type: object
+            properties:
+              organizationName:
+                type: string
+                example: "University of Example"
+              level:
+                type: string
+                enum: ["Среднее общее", "Среднее профессиональное", "Высшее"]
+              specialization:
+                type: string
+                example: "Computer Science"
+              graduationYear:
+                type: integer
+                example: 2020
+        additionalInfo:
+          type: string
+          example: "Additional information about the user."
+        contacts:
+          type: object
+          properties:
+            email:
+              type: string
+              format: email
+              example: "user@example.com"
+            phone:
+              type: string
+              example: "+123456789"
+            social:
+              type: object
+              properties:
+                telegram:
+                  type: string
+                  example: "@user"
+                whatsapp:
+                  type: string
+                  example: "+123456789"
+                vk:
+                  type: string
+                  example: "user_vk_id"
+        favouriteRequests:
+          type: array
+          items:
+            type: string
+
+    HelpRequestData:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "request-id-1"
+        title:
+          type: string
+          example: "Help needed for community project"
+        organization:
+          type: object
+          properties:
+            title:
+              type: string
+              example: "Community Org"
+            isVerified:
+              type: boolean
+        description:
+          type: string
+          example: "Description of the help request."
+        goalDescription:
+          type: string
+          example: "Goal of the request."
+        actionsSchedule:
+          type: array
+          items:
+            type: object
+            properties:
+              stepLabel:
+                type: string
+                example: "Step 1"
+              isDone:
+                type: boolean
+        endingDate:
+          type: string
+          format: date
+          example: "2023-12-31"
+        location:
+          type: object
+          properties:
+            latitude:
+              type: number
+              example: 40.712776
+            longitude:
+              type: number
+              example: -74.005974
+            title:
+              type: string
+              example: "New York"
+        contacts:
+          type: object
+          properties:
+            email:
+              type: string
+              format: email
+              example: "contact@example.com"
+            phone:
+              type: string
+              example: "+123456789"
+            social:
+              type: object
+              properties:
+                telegram:
+                  type: string
+                  example: "@contact"
+                whatsapp:
+                  type: string
+                  example: "+123456789"
+                vk:
+                  type: string
+                  example: "contact_vk_id"
+        requesterType:
+          type: string
+          enum: ["person", "organization"]
+        helpType:
+          type: string
+          enum: ["finance", "material"]
+        helperRequirements:
+          type: object
+          properties:
+            helperType:
+              type: string
+              enum: ["group", "single"]
+            isOnline:
+              type: boolean
+            qualification:
+              type: string
+              enum: ["professional", "common"]
+        contributorsCount:
+          type: integer
+          example: 5
+        requestGoal:
+          type: integer
+          example: 10000
+        contributionCurrentCount:
+          type: integer
+          example: 2500
+

@@ -38,8 +38,8 @@ export type HelpRequestData = {
     contributorsCount: number,
     requestGoal: number,
     contributionCurrentCount: number
-
 }
+
 export const generateHelpRequests = (count: number): HelpRequestData[] => {
     const result = [];
     for(let i = 0; i < count; i++) {
