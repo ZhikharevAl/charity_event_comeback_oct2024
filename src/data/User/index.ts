@@ -2,6 +2,7 @@
 import {v4 as uuid} from 'uuid';
 import {HelpRequestRepository} from "../HelpRequest";
 import {fakerRU as faker, Sex} from '@faker-js/faker';
+import log4js from "log4js";
 
 export type UserData = {
     id: string;
@@ -102,10 +103,13 @@ export class UserRepository {
     }
 
     public addRequestToFavourites(requestId: string, userId: string): void {
+        const logger = log4js.getLogger();
         if (!this.users[userId]) {
+            logger.error("UserRepository.addRequestToFavourites. Error. No user found", userId);
             throw new Error("No user with id " + userId);
         }
         if (!this.requestRepository.checkIsRequestExist(requestId)) {
+            logger.error("UserRepository.addRequestToFavourites. Error. No request found", userId, requestId);
             throw new Error("No request with id " + requestId);
         }
         this.users[userId].favouriteRequests.push(requestId);
