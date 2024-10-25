@@ -14,7 +14,7 @@
 
 ## Требования
 - общетехнические - [тут](./requirements/Common.md)
-- подробные - [тут](./requirements/[RU]%User%Scenarios.md)
+- подробные - [тут](./requirements/user-scenarios.md)
 
 ## Как запустить проект (backend)
 ### Перед началом
