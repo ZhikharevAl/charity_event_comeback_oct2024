@@ -5,6 +5,8 @@ import bodyParser from "body-parser";
 import cors from 'cors';
 import log4js from "log4js";
 import dotenv from "dotenv";
+import YAML from 'yamljs';
+import swaggerUi from 'swagger-ui-express';
 import loggerSetup from "./src/utils/configureLogger";
 import {UserRepository} from "./src/data/User";
 import {HelpRequestRepository} from "./src/data/HelpRequest";
@@ -38,6 +40,11 @@ const authMiddleware = (req: Request<never>, res: Response, next: NextFunction) 
     req.userId = userId;
     next();
 };
+
+
+// OpenAPI specification
+const openApiDocumentation = YAML.load('./apispec.yaml');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiDocumentation));
 
 
 app.post('/api/auth', (req: Request, res: Response) => {
