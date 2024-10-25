@@ -7,7 +7,7 @@ info:
 paths:
   /api/auth:
     post:
-      summary: User login and JWT token generation
+      summary: (Auth) User login and JWT token generation
       requestBody:
         required: true
         content:
@@ -40,7 +40,7 @@ paths:
 
   /api/user/favourites:
     get:
-      summary: Get user's favourite requests
+      summary: (LoadUserFavorites) Get user's favourite requests
       security:
         - bearerAuth: []
       responses:
@@ -57,7 +57,7 @@ paths:
           description: Unauthorized
 
     post:
-      summary: Add request to user's favourites
+      summary: (AddToFavourites) Add request to user's favourites
       security:
         - bearerAuth: []
       requestBody:
@@ -83,7 +83,7 @@ paths:
 
   /api/user/favourites/{requestId}:
     delete:
-      summary: Remove request from user's favourites
+      summary: (RemoveFromFavourites) Remove request from user's favourites
       security:
         - bearerAuth: []
       parameters:
@@ -106,7 +106,7 @@ paths:
 
   /api/user:
     get:
-      summary: Get user's profile data
+      summary: (LoadUserInfo) Get user's profile data
       security:
         - bearerAuth: []
       responses:
@@ -121,7 +121,7 @@ paths:
 
   /api/request/{id}/contribution:
     post:
-      summary: Contribute to a help request
+      summary: (ContributeToRequest) Contribute to a help request
       parameters:
         - name: id
           in: path
@@ -142,7 +142,7 @@ paths:
 
   /api/request/{id}:
     get:
-      summary: Get details of a specific help request
+      summary: (LoadRequestDetails) Get details of a specific help request
       parameters:
         - name: id
           in: path
@@ -164,7 +164,7 @@ paths:
 
   /api/request:
     get:
-      summary: Get all help requests
+      summary: (LoadRequests) Get all help requests
       responses:
         '200':
           description: List of all help requests
