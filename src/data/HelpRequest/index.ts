@@ -27,7 +27,18 @@ export type HelpRequestData = {
             whatsapp?: string;
             vk?: string;
         }
-    }
+    },
+    requesterType: "person" | 'organization',
+    helpType: 'finance' | 'material',
+    helperRequirements: {
+        helperType: 'group' | 'single',
+        isOnline: boolean,
+        qualification: 'professional' | 'common',
+    },
+    contributorsCount: number,
+    requestGoal: number,
+    contributionCurrentCount: number
+
 }
 export const generateHelpRequests = (count: number): HelpRequestData[] => {
     const result = [];
@@ -60,7 +71,17 @@ export const generateHelpRequests = (count: number): HelpRequestData[] => {
                     whatsapp: '@test',
                     vk: 'test@test.com',
                 }
-            }
+            },
+            requesterType: i % 3 === 0 ? "person" : 'organization',
+            helpType: i % 4 === 0 ? 'material' : 'finance',
+            helperRequirements: {
+                helperType: i % 5 === 0 ? 'group' : "single",
+                isOnline: !(i % 3),
+                qualification: i % 6 ? 'professional' : 'common',
+            },
+            contributorsCount: i * 10 + i,
+            requestGoal: i * 23 + i * 50,
+            contributionCurrentCount: Math.abs(Math.floor(i * 100 - i * 23)),
         }
         result.push(requestData);
     }
