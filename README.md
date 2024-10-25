@@ -1,7 +1,9 @@
 # charity_event_oct2024
-Assests for charity event in October 2024
+Репозиторий для Благотворительного хакатона джунов - Октябрь 2024
 
-## Как запустить проект
+Тема хакатона - Помощь пожилым людям
+
+## Как запустить проект (backend)
 ### Перед началом
 - переименовать файл `.env-example` в `env`
 ### Локальный дев-сервер
@@ -13,3 +15,11 @@ Assests for charity event in October 2024
 - `npm run build`
 - `docker build -t charity_back .`
 - `docker run -p 4040:4040 charity_back`
+
+## Требования
+- общетехнические - `./requirements/Common.md`
+- пользовательские - `./requirements/[RU] User Scenarios.md`
+
+## OpenAPI спецификация
+- файл: `./apispec.yaml`
+- эндпоинт: `/api-docs`
