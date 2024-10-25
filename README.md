@@ -4,6 +4,14 @@
 
 ## Дизайн
 
+[Фигма](https://www.figma.com/design/8GhqLYG4S1bGwuwTpFlzrH/%D0%9C%D0%B0%D1%80%D0%BA%D0%B5%D1%82%D0%BF%D0%BB%D0%B5%D0%B9%D1%81-%D0%B7%D0%B0%D0%BF%D1%80%D0%BE%D1%81%D0%BE%D0%B2-%D0%BE-%D0%BF%D0%BE%D0%BC%D0%BE%D1%89%D0%B8?node-id=2-2&node-type=canvas&t=PxezvoMSq26STuDC-0)
+
+Список экранов:
+- логин;
+- каталог запросов о помощи (запросы могут отображаться гридом, списком или на карте);
+- страница одного запроса;
+- страница профиля юзера;
+
 ## Требования
 - общетехнические - `./requirements/Common.md`
 - пользовательские - `./requirements/[RU] User Scenarios.md`
