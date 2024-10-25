@@ -13,8 +13,8 @@
 - страница профиля юзера;
 
 ## Требования
-- общетехнические - `./requirements/Common.md`
-- пользовательские - `./requirements/[RU] User Scenarios.md`
+- общетехнические - [тут](./requirements/Common.md)
+- подробные - [тут](./requirements/[RU]%User%Scenarios.md)
 
 ## Как запустить проект (backend)
 ### Перед началом
@@ -31,4 +31,4 @@
 
 ## OpenAPI спецификация
 - файл: `./apispec.yaml`
-- эндпоинт: `/api-docs`
+- эндпоинт: `/api-docs` (после запуска бэка переходите на http://localhost:4040/api-docs)
