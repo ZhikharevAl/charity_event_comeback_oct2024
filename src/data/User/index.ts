@@ -1,15 +1,19 @@
+// @ts-nocheck
 import {v4 as uuid} from 'uuid';
 import {HelpRequestRepository} from "../HelpRequest";
+import {fakerRU as faker, Sex} from '@faker-js/faker';
 
 export type UserData = {
     id: string;
     name: string;
     lastName: string;
-    birthdate: string; // Date
+    birthdate: Date;
+    status: 'Начинающий' | 'Опытный',
     baseLocations: Array<{
         latitude: number;
         longitude: number;
-        title: string;
+        district: string;
+        city: string;
     }>,
     educations: Array<{
        organizationName: string;
@@ -35,28 +39,36 @@ export const generateUsers = (count: number): UserData[] => {
     for(let i = 0; i < count; i++) {
         const userData: UserData = {
             id: uuid(),
-            name: `User ${i}`,
-            lastName: `UserLastName ${i}`,
-            birthdate: `${i % 28}.${i % 12}.19${100 - i % 23}`,
+            name: faker.person.firstName(i % 2 === 0 ? Sex.Male : Sex.Female),
+            lastName: faker.person.lastName(i % 2 === 0 ? 'male' : 'female'),
+            birthdate: faker.date.between({ from: '1988-01-01', to: '2007-12-31' }),
+            status: i % 3 === 0 ? 'Начинающий' : 'Опытный',
             baseLocations: [
                 {
-                    latitude: 55.751244,
-                    longitude: 37.618423,
-                    title: 'Moscow',
+                    latitude: faker.location.latitude(),
+                    longitude: faker.location.longitude(),
+                    district: faker.location.state(),
+                    city: faker.location.city(),
+                },
+                {
+                    latitude: faker.location.latitude(),
+                    longitude: faker.location.longitude(),
+                    district: faker.location.state(),
+                    city: faker.location.city(),
                 }
             ],
             educations: [
                 {
-                    organizationName: "МОУ СОШ №" + (i % 26),
-                    level: 'Среднее общее',
-                    specialization: '',
-                    graduationYear: 2005,
+                    organizationName: i % 3 == 0 ? "МОУ СОШ №" + (i % 26) : 'НПГУ ДПИ',
+                    level: i % 3 == 0 ? 'Среднее общее' : 'Высшее',
+                    specialization: i % 3 == 0 ? '' : faker.person.jobTitle(),
+                    graduationYear: faker.number.int({min: 1999, max: 2020}),
                 }
             ],
-            additionalInfo: 'Очень хороший человек. Добрый6 отзывчивый, честный и замечательный',
+            additionalInfo: 'Очень хороший человек. Добрый, отзывчивый, честный и замечательный',
             contacts: {
                 email: 'test@test.com',
-                phone: '+1234567890',
+                phone: faker.phone.number({ style: 'international' }),
                 social: {
                     telegram: '@test',
                     whatsapp: '@test',

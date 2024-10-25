@@ -1,13 +1,13 @@
 openapi: 3.0.0
 info:
   title: ExpressJS API
-  version: 1.0.0
-  description: API for user authorization, user data, and help request management
+  version: 1.1.0
+  description: API для управления авторизацией пользователей, данными пользователей и запросами о помощи
 
 paths:
   /api/auth:
     post:
-      summary: (Auth) User login and JWT token generation
+      summary: (Auth) Авторизация пользователя и генерация JWT токена
       requestBody:
         required: true
         content:
@@ -23,7 +23,7 @@ paths:
                   example: "password123"
       responses:
         '200':
-          description: Successful login and token generation
+          description: Успешный вход и генерация токена
           content:
             application/json:
               schema:
@@ -36,16 +36,18 @@ paths:
                     type: string
                     example: "jwt-token"
         '400':
-          description: Invalid login or password
+          description: Неверный логин или пароль
+        '500':
+          description: Запланированная ошибка сервера
 
   /api/user/favourites:
     get:
-      summary: (LoadUserFavorites) Get user's favourite requests
+      summary: (LoadUserFavorites) Получение списка избранных запросов пользователя
       security:
         - bearerAuth: []
       responses:
         '200':
-          description: Array of user's favourite requests
+          description: Массив избранных запросов пользователя
           content:
             application/json:
               schema:
@@ -54,10 +56,12 @@ paths:
                   type: string
                   example: "request-id-1"
         '401':
-          description: Unauthorized
+          description: Неавторизован
+        '500':
+          description: Запланированная ошибка сервера
 
     post:
-      summary: (AddToFavourites) Add request to user's favourites
+      summary: (AddToFavourites) Добавление запроса в избранное пользователя
       security:
         - bearerAuth: []
       requestBody:
@@ -72,18 +76,20 @@ paths:
                   example: "request-id-1"
       responses:
         '200':
-          description: Request added to favourites successfully
+          description: Запрос успешно добавлен в избранное
           content:
             text/plain:
               schema:
                 type: string
-                example: "Request is added to Favourites successfully."
+                example: "Запрос успешно добавлен в избранное."
         '400':
-          description: Failed to add request to favourites
+          description: Ошибка при добавлении в избранное
+        '500':
+          description: Запланированная ошибка сервера
 
   /api/user/favourites/{requestId}:
     delete:
-      summary: (RemoveFromFavourites) Remove request from user's favourites
+      summary: (RemoveFromFavourites) Удаление запроса из избранного пользователя
       security:
         - bearerAuth: []
       parameters:
@@ -95,33 +101,37 @@ paths:
             example: "request-id-1"
       responses:
         '200':
-          description: Request removed from favourites successfully
+          description: Запрос успешно удален из избранного
           content:
             text/plain:
               schema:
                 type: string
-                example: "Request is removed from Favourites successfully."
+                example: "Запрос успешно удален из избранного."
         '400':
-          description: Failed to remove request from favourites
+          description: Ошибка при удалении из избранного
+        '500':
+          description: Запланированная ошибка сервера
 
   /api/user:
     get:
-      summary: (LoadUserInfo) Get user's profile data
+      summary: (LoadUserInfo) Получение данных профиля пользователя
       security:
         - bearerAuth: []
       responses:
         '200':
-          description: User profile data
+          description: Данные профиля пользователя
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserData'
         '401':
-          description: Unauthorized
+          description: Неавторизован
+        '500':
+          description: Запланированная ошибка сервера
 
   /api/request/{id}/contribution:
     post:
-      summary: (ContributeToRequest) Contribute to a help request
+      summary: (ContributeToRequest) Внесение вклада в запрос на помощь
       parameters:
         - name: id
           in: path
@@ -131,18 +141,20 @@ paths:
             example: "request-id-1"
       responses:
         '200':
-          description: Contribution was successful
+          description: Вклад успешно внесен
           content:
             text/plain:
               schema:
                 type: string
-                example: "Contribution in Request is done successfully."
+                example: "Вклад успешно внесен."
         '404':
-          description: Request not found
+          description: Запрос не найден
+        '500':
+          description: Запланированная ошибка сервера
 
   /api/request/{id}:
     get:
-      summary: (LoadRequestDetails) Get details of a specific help request
+      summary: (LoadRequestDetails) Получение деталей запроса на помощь
       parameters:
         - name: id
           in: path
@@ -152,28 +164,32 @@ paths:
             example: "request-id-1"
       responses:
         '200':
-          description: Help request details
+          description: Детали запроса на помощь
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/HelpRequestData'
         '400':
-          description: No request ID provided
+          description: Отсутствует ID запроса
         '404':
-          description: Request not found
+          description: Запрос не найден
+        '500':
+          description: Запланированная ошибка сервера
 
   /api/request:
     get:
-      summary: (LoadRequests) Get all help requests
+      summary: (LoadRequests) Получение всех запросов на помощь
       responses:
         '200':
-          description: List of all help requests
+          description: Список всех запросов на помощь
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/HelpRequestData'
+        '500':
+          description: Запланированная ошибка сервера
 
 components:
   securitySchemes:
@@ -191,14 +207,17 @@ components:
           example: "user-id-1"
         name:
           type: string
-          example: "John"
+          example: "Александр"
         lastName:
           type: string
-          example: "Doe"
+          example: "Иванов"
         birthdate:
           type: string
           format: date
-          example: "1990-01-01"
+          example: "1950-07-23"
+        status:
+          type: string
+          enum: ["Начинающий", "Опытный"]
         baseLocations:
           type: array
           items:
@@ -210,9 +229,12 @@ components:
               longitude:
                 type: number
                 example: -74.005974
-              title:
+              district:
                 type: string
-                example: "New York"
+                example: "Центральный"
+              city:
+                type: string
+                example: "Москва"
         educations:
           type: array
           items:
@@ -220,19 +242,19 @@ components:
             properties:
               organizationName:
                 type: string
-                example: "University of Example"
+                example: "МГУ"
               level:
                 type: string
                 enum: ["Среднее общее", "Среднее профессиональное", "Высшее"]
               specialization:
                 type: string
-                example: "Computer Science"
+                example: "Филология"
               graduationYear:
                 type: integer
-                example: 2020
+                example: 1980
         additionalInfo:
           type: string
-          example: "Additional information about the user."
+          example: "Дополнительная информация о пользователе."
         contacts:
           type: object
           properties:
@@ -268,21 +290,21 @@ components:
           example: "request-id-1"
         title:
           type: string
-          example: "Help needed for community project"
+          example: "Помощь в проекте"
         organization:
           type: object
           properties:
             title:
               type: string
-              example: "Community Org"
+              example: "Благотворительная организация"
             isVerified:
               type: boolean
         description:
           type: string
-          example: "Description of the help request."
+          example: "Описание запроса на помощь."
         goalDescription:
           type: string
-          example: "Goal of the request."
+          example: "Цель данного запроса."
         actionsSchedule:
           type: array
           items:
@@ -290,7 +312,7 @@ components:
             properties:
               stepLabel:
                 type: string
-                example: "Step 1"
+                example: "Шаг 1"
               isDone:
                 type: boolean
         endingDate:
@@ -306,9 +328,12 @@ components:
             longitude:
               type: number
               example: -74.005974
-            title:
+            district:
               type: string
-              example: "New York"
+              example: "Пресненский"
+            city:
+              type: string
+              example: "Москва"
         contacts:
           type: object
           properties:
@@ -319,18 +344,9 @@ components:
             phone:
               type: string
               example: "+123456789"
-            social:
-              type: object
-              properties:
-                telegram:
-                  type: string
-                  example: "@contact"
-                whatsapp:
-                  type: string
-                  example: "+123456789"
-                vk:
-                  type: string
-                  example: "contact_vk_id"
+            website:
+              type: string
+              example: "https://example.com"
         requesterType:
           type: string
           enum: ["person", "organization"]
@@ -350,11 +366,11 @@ components:
               enum: ["professional", "common"]
         contributorsCount:
           type: integer
-          example: 5
+          example: 10
         requestGoal:
           type: integer
           example: 10000
-        contributionCurrentCount:
+        requestGoalCurrentValue:
           type: integer
           example: 2500
 

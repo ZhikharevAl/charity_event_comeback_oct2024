@@ -27,6 +27,24 @@ const requestRepository = new HelpRequestRepository();
 const userRepository = new UserRepository(requestRepository);
 const authRepository = new AuthRepository(userRepository.getUsers());
 
+// OpenAPI specification
+const openApiDocumentation = YAML.load('./apispec2.yaml');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiDocumentation));
+
+// ERROR MIDDLEWARE
+let ERROR_REQUEST_NUMBER = 1;
+const errorMiddleware = (req: Request<never>, res: Response, next: NextFunction) => {
+    if (ERROR_REQUEST_NUMBER % 5 === 0) {
+        ERROR_REQUEST_NUMBER++;
+        return res.status(500).send('Planned Server Error')
+    } else {
+        ERROR_REQUEST_NUMBER++;
+        next();
+    }
+}
+
+app.use(errorMiddleware);
+
 // AUTH
 const authMiddleware = (req: Request<never>, res: Response, next: NextFunction) => {
     const token = req.headers.authorization?.split(' ')[1];
@@ -40,12 +58,6 @@ const authMiddleware = (req: Request<never>, res: Response, next: NextFunction) 
     req.userId = userId;
     next();
 };
-
-
-// OpenAPI specification
-const openApiDocumentation = YAML.load('./apispec.yaml');
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiDocumentation));
-
 
 app.post('/api/auth', (req: Request, res: Response) => {
     const { login, password } = req.body;
