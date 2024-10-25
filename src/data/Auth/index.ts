@@ -49,17 +49,23 @@ export class AuthRepository {
             return (decoded as JwtPayload)?.id || '';
         } catch (err) {
             const logger = log4js.getLogger();
-            logger.error(err);
+            logger.error("AuthRepository.verifyToken. Error. Token is not decoded ", token,err);
             return '';
         }
     };
 
     public login(login: string, password: string) {
+        const logger = log4js.getLogger();
         const authRecord = this.auths[login];
         let token = '';
         if (authRecord && this.checkCredentials(login, password)) {
             const userId = authRecord.userId;
             token = jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: '1h' });
+        }
+        if (token) {
+            logger.info("AuthRepository.login. User is authenticated", login, password);
+        } else {
+            logger.error("AuthRepository.login failed", login, password);
         }
         return token;
     }
