@@ -12,11 +12,16 @@
 - страница одного запроса;
 - страница профиля юзера;
 
+## Бэкенд
+
+Лежит [вот тут](https://natticharity.eveloth.ru)
+[API-дока](https://natticharity.eveloth.ru/api-docs/)
+
 ## Требования
 - общетехнические - [тут](./requirements/Common.md)
 - ❗подробные - [тут](./requirements/user-scenarios.md)
 
-## Как запустить проект (backend)
+## Как запустить локально проект (backend)
 ### Перед началом
 - переименовать файл `.env-example` в `env`
 ### Локальный дев-сервер (основной способ запуска)
