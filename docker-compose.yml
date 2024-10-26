@@ -1,0 +1,10 @@
+services:
+  app:
+    container_name: charity_back
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '4040:4040'
+    environment:
+      - PORT=4040

@@ -33,7 +33,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiDocumentation));
 
 // ERROR MIDDLEWARE
 let ERROR_REQUEST_NUMBER = 1;
-const errorMiddleware = (req: Request<never>, res: Response, next: NextFunction) => {
+const errorMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const logger = log4js.getLogger();
     logger.info("ERROR_MIDDLEWARE request log: ", req?.originalUrl, req?.body);
     if (ERROR_REQUEST_NUMBER % 5 === 0) {
@@ -49,7 +49,7 @@ const errorMiddleware = (req: Request<never>, res: Response, next: NextFunction)
 app.use(errorMiddleware);
 
 // AUTH
-const authMiddleware = (req: Request<never>, res: Response, next: NextFunction) => {
+const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
         const logger = log4js.getLogger();
@@ -100,7 +100,7 @@ app.post('/api/auth', (req: Request, res: Response) => {
 app.use(authMiddleware);
 
 // USER
-app.get('/api/user/favourites', (req: Request<never>, res: Response) => {
+app.get('/api/user/favourites', (req: Request, res: Response) => {
     const logger = log4js.getLogger();
     const userId= req.userId;
     const favourites = userRepository.getUserFavourites(userId);
@@ -194,7 +194,7 @@ app.get('/api/request', (req: Request, res: Response) => {
 })
 
 // web server
-const port = process.env.PORT || 3030;
+const port = process.env.PORT || 4040;
 const server = createServer(app);
 
 // configure of server
