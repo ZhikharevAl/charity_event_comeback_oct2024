@@ -14,8 +14,8 @@
 
 ## Бэкенд
 
-Лежит [вот тут](https://natticharity.eveloth.ru)
-[API-дока](https://natticharity.eveloth.ru/api-docs/)
+- Лежит [вот тут](https://natticharity.eveloth.ru)
+- [API-дока](https://natticharity.eveloth.ru/api-docs/)
 
 ## Требования
 - общетехнические - [тут](./requirements/Common.md)
