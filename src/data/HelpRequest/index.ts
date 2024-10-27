@@ -192,7 +192,7 @@ export const generateHelpRequests = (count: number): HelpRequestData[] => {
             },
             contributorsCount: i * 10 + i,
             requestGoal: i * 23 + i * 50,
-            requestGoalCurrentValue: Math.abs(Math.floor(i * 100 - i * 23)),
+            requestGoalCurrentValue: i * 23 + i * 60,
         }
         result.push(requestData);
     }
