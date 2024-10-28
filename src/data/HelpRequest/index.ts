@@ -191,8 +191,8 @@ export const generateHelpRequests = (count: number): HelpRequestData[] => {
                 qualification: i % 6 ? 'professional' : 'common',
             },
             contributorsCount: i * 10 + i,
-            requestGoal: i * 23 + i * 50,
-            requestGoalCurrentValue: i * 23 + i * 60,
+            requestGoal: i * 23 + i * 50 + 100,
+            requestGoalCurrentValue: i * 23 + i * 60 + 5,
         }
         result.push(requestData);
     }
