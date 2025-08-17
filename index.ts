@@ -105,7 +105,7 @@ const normalizeRoute = (path: string): string => {
 
 // METRICS MIDDLEWARE
 app.use((req: Request, res: Response, next: NextFunction) => {
-    if (req.path === '/metrics') {
+    if (req.path === '/metrics' || req.path === '/health') {
         return next();
     }
 
@@ -141,6 +141,11 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // ERROR MIDDLEWARE с метриками
 let ERROR_REQUEST_NUMBER = 1;
 const errorMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    // Пропускаем health и metrics эндпоинты
+    if (req.path === '/health' || req.path === '/metrics') {
+        return next();
+    }
+
     const logger = log4js.getLogger();
     logger.info("ERROR_MIDDLEWARE request log: ", req?.originalUrl, req?.body);
 
@@ -165,6 +170,11 @@ app.use(errorMiddleware);
 
 // AUTH с метриками
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    // Пропускаем health и metrics эндпоинты
+    if (req.path === '/health' || req.path === '/metrics') {
+        return next();
+    }
+
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
         const logger = log4js.getLogger();
@@ -196,6 +206,16 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     req.userId = userId;
     next();
 };
+
+// HEALTH CHECK ENDPOINT (ПЕРЕД middleware'ами)
+app.get('/health', (req: Request, res: Response) => {
+    res.status(200).json({
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        version: process.env.APP_VERSION || '1.0.0'
+    });
+});
 
 // METRICS ENDPOINT
 app.get('/metrics', async (req: Request, res: Response) => {
